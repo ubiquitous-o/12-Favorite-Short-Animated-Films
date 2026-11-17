@@ -388,23 +388,28 @@
         onReady: () => {
           playerReady = true;
           if (pendingVid) loadVideo(pendingVid);
-          // 音ありの自動再生はブラウザが止めることがある。その場合は無音で流し始め、最初の操作で音を戻す
-          setTimeout(() => {
+          // 音ありの自動再生はブラウザが止めることがある。その場合だけ無音で流し始める。
+          // 読み込み中（状態 3）は「止められた」のではないので待つ
+          const check = () => {
             if (state.everPlayed) return;
-            setMuted(true);
-            player.playVideo();
-            const restore = () => {
-              document.removeEventListener('pointerdown', restore, true);
-              document.removeEventListener('keydown', restore, true);
-              setMuted(false);
-            };
-            document.addEventListener('pointerdown', restore, true);
-            document.addEventListener('keydown', restore, true);
-          }, 4000);
+            if (player.getPlayerState() === 3) { setTimeout(check, 2000); return; }
+            playMutedUntilGesture();
+          };
+          setTimeout(check, 4000);
         },
         onStateChange: (e) => {
-          if (e.data === 1) { state.everPlayed = true; clearTimer(); hideOverlay(); }
-          else if (e.data === 0) next();
+          if (e.data === 1) {
+            state.everPlayed = true; clearTimer(); hideOverlay();
+            // YouTube は前回の消音を覚えている。最初の再生で一度だけ音を戻してみる。
+            // ブラウザが許さない場合は再生が止まるので、そのときは無音に戻して操作を待つ
+            if (!soundProbed) {
+              soundProbed = true;
+              if (!state.muted && player.isMuted()) {
+                player.unMute();
+                setTimeout(() => { if (!state.muted && player.getPlayerState() === 2) playMutedUntilGesture(); }, 700);
+              }
+            }
+          } else if (e.data === 0) next();
         },
         onError: () => {
           const f = state.current;
@@ -428,7 +433,29 @@
   function setMuted(m) {
     state.muted = m;
     if (!playerReady) return;
-    if (m) player.mute(); else { player.unMute(); player.setVolume(100); player.playVideo(); }
+    if (m) player.mute();
+    else { player.unMute(); if (player.getVolume() === 0) player.setVolume(100); player.playVideo(); }
+  }
+
+  // ブラウザに音を止められたとき: 無音で流し、最初の操作（動画の上のクリックも含む）で音を戻す
+  let soundProbed = false, awaitingGesture = false;
+  function playMutedUntilGesture() {
+    setMuted(true);
+    player.playVideo();
+    if (awaitingGesture) return;
+    awaitingGesture = true;
+    const restore = () => {
+      document.removeEventListener('pointerdown', restore, true);
+      document.removeEventListener('keydown', restore, true);
+      window.removeEventListener('blur', onBlur);
+      awaitingGesture = false;
+      setMuted(false);
+    };
+    // 動画（iframe）の中のクリックはこのページに届かない。フォーカスが iframe に移ったことで知る
+    const onBlur = () => setTimeout(() => { if (document.activeElement && document.activeElement.tagName === 'IFRAME') restore(); }, 0);
+    document.addEventListener('pointerdown', restore, true);
+    document.addEventListener('keydown', restore, true);
+    window.addEventListener('blur', onBlur);
   }
 
   function loadVideo(vid) {
