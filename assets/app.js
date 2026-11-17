@@ -22,7 +22,7 @@
     ja: {
       order: '順番', optYear: '年代順（1906→）', optPicks: '推薦が多い順', optCurator: '紹介者ごと', optShuffle: 'シャッフル',
       clips: '予告編・抜粋も流す', doubt: '不確かなマッチも流す', prev: '前の作品', next: '次の作品',
-      about: '出典・クレジット', close: '閉じる',
+      about: '出典', close: '閉じる',
       gateTitle: '上映を始める', gateSound: '🔊 音ありで始める', gateMuted: '🔇 音なしで始める',
       gateCountdown: (n) => `選ばない場合、${n}秒後に音なしで始まる`,
       tabFilms: '作品', tabPeople: '紹介者', search: '作品・監督・紹介者で絞り込み', timeline: '年表', loading: 'データを読み込み中…',
@@ -51,7 +51,7 @@
     en: {
       order: 'Order', optYear: 'By year (1906→)', optPicks: 'Most picked', optCurator: 'Person by person', optShuffle: 'Shuffle',
       clips: 'Include trailers & clips', doubt: 'Include doubtful matches', prev: 'Previous film', next: 'Next film',
-      about: 'Sources & credits', close: 'Close',
+      about: 'Sources', close: 'Close',
       gateTitle: 'Start the screening', gateSound: '🔊 Start with sound', gateMuted: '🔇 Start muted',
       gateCountdown: (n) => `If you don’t choose, it starts muted in ${n} seconds`,
       tabFilms: 'Films', tabPeople: 'People', search: 'Filter by film, director or person', timeline: 'Timeline', loading: 'Loading data…',
