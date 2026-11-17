@@ -78,7 +78,7 @@ html[lang="ja"] [data-lang="en"], html[lang="en"] [data-lang="ja"] { display: no
 .gate-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 .gate-actions button { padding: 9px 18px; font-size: 14px; }
 .overlay p { margin: 0; max-width: 46em; }
-.overlay .big { font-family: var(--serif); font-size: 20px; }
+.overlay .big { font-size: 18px; font-weight: 600; }
 .overlay .small { color: var(--muted); }
 
 /* now playing */
