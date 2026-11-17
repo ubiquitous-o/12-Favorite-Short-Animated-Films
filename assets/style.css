@@ -43,9 +43,15 @@ html[lang="ja"] [data-lang="en"], html[lang="en"] [data-lang="ja"] { display: no
   padding: 8px 16px;
   border-bottom: 1px solid var(--line);
 }
-.brand strong { font-family: var(--serif); font-size: 16px; letter-spacing: .04em; margin-right: 10px; }
-.brand .sub { color: var(--muted); }
+/* 件数表示は長さが変わるので、左側の伸び縮みする枠に入れて右のボタン群を動かさない */
+.brand { flex: 1 1 260px; min-width: 0; display: flex; gap: 14px; align-items: baseline; }
+.brand strong { font-family: var(--serif); font-size: 16px; letter-spacing: .04em; white-space: nowrap; }
+.brand .counter { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .controls { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+/* 文言が切り替わるボタンは、両方の文言を重ねて置き、長いほうの幅に固定する */
+#mute { display: inline-grid; }
+#mute span { grid-area: 1 / 1; }
+#mute span[aria-hidden] { visibility: hidden; }
 .ctl { color: var(--muted); display: inline-flex; gap: 5px; align-items: center; white-space: nowrap; }
 .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
 
@@ -73,7 +79,7 @@ html[lang="ja"] [data-lang="en"], html[lang="en"] [data-lang="ja"] { display: no
 .overlay .small { color: var(--muted); }
 
 /* now playing */
-.info { flex: 1 1 0; min-height: 0; overflow: auto; padding: 14px 20px 20px; }
+.info { flex: 1 1 0; min-height: 0; overflow: auto; scrollbar-gutter: stable; padding: 14px 20px 20px; }
 .info .eyebrow { margin: 0; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
 .info h1 { font: 600 26px/1.25 var(--serif); margin: 4px 0 0; }
 .info .jp { font-family: var(--serif); font-size: 15px; margin: 2px 0 0; color: var(--muted); }
@@ -106,7 +112,7 @@ html[lang="ja"] [data-lang="en"], html[lang="en"] [data-lang="ja"] { display: no
 .scope .name { font-family: var(--serif); font-size: 16px; }
 .scope .role, .scope .note { color: var(--muted); margin: 2px 0; }
 .scope .links { display: flex; flex-wrap: wrap; gap: 2px 12px; margin: 6px 0; }
-.list { flex: 1; overflow: auto; min-height: 0; }
+.list { flex: 1; overflow: auto; scrollbar-gutter: stable; min-height: 0; }
 .row {
   display: grid; grid-template-columns: 3.2em minmax(0, 1fr) auto; gap: 8px;
   width: 100%; text-align: left; align-items: baseline;

@@ -2,6 +2,8 @@
 
 **English** | [日本語](README.ja.md)
 
+**▶ https://ubiquitous-o.github.io/12-Favorite-Short-Animated-Films/**
+
 A static site that plays short animated films chosen by filmmakers, one after another, with credit to the people who picked them and to the sources.
 
 ## Credits

@@ -425,7 +425,9 @@
   };
 
   function renderMute() {
-    $('#mute').textContent = state.muted ? t('unmute') : t('mute');
+    // 表示しない側の文言も見えない形で入れておき、切り替えてもボタンの幅が変わらないようにする
+    const [on, off] = state.muted ? ['unmute', 'mute'] : ['mute', 'unmute'];
+    fill($('#mute'), h('span', {}, t(on)), h('span', { 'aria-hidden': 'true' }, t(off)));
     $('#mute').classList.toggle('accent', state.muted);
   }
   function setMuted(m) {

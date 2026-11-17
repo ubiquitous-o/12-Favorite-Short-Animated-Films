@@ -2,6 +2,8 @@
 
 [English](README.md) | **日本語**
 
+**▶ https://ubiquitous-o.github.io/12-Favorite-Short-Animated-Films/**
+
 作家たちが選んだ短編アニメーションを、選んだ人と出典の情報とともに順番に流し続ける静的サイト。
 
 ## クレジット

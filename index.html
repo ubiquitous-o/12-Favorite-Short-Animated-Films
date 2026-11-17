@@ -12,9 +12,9 @@
 <header class="bar">
   <div class="brand">
     <strong>12 favorite short animated films</strong>
+    <span id="counter" class="counter" aria-live="polite"></span>
   </div>
   <div class="controls">
-    <span id="counter" class="counter" aria-live="polite"></span>
     <label class="ctl"><span data-t="order"></span>
       <select id="order">
         <option value="year" data-t="optYear"></option>
@@ -29,13 +29,11 @@
     <button id="next" type="button" data-t-title="next">⏭</button>
     <button id="mute" type="button" data-t-title="muteTitle"></button>
     <button id="aboutBtn" type="button" data-t="about"></button>
-    <!-- どちらの言語で表示していても読めるよう、ここだけは常に英語と日本語を併記する -->
-    <label class="ctl lang"><span aria-hidden="true">🌐</span> Language
-      <select id="lang" aria-label="Language / 言語">
-        <option value="ja">日本語 (Japanese)</option>
-        <option value="en">English</option>
-      </select>
-    </label>
+    <!-- どちらの言語で表示していても読めるよう、言語コードを併記する -->
+    <select id="lang" aria-label="Language / 言語">
+      <option value="ja">日本語 (JA)</option>
+      <option value="en">English (EN)</option>
+    </select>
   </div>
 </header>
 
