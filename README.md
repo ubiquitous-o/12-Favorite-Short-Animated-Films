@@ -130,10 +130,28 @@ On pull requests only step 1 runs.
 
 The first time, set Settings → Pages → Source to “GitHub Actions”.
 
-### Pulling in updates from the sheet
+### Keeping up with the sheet
 
-When Zach's sheet changes, run this, review the diff, and commit. Any fixes made directly to the CSV files in `data/booklet/` will be overwritten.
+The site reads the copy in `data/booklet/`, not the sheet itself, so nothing that happens to the sheet can break the site.
+
+[`.github/workflows/sync-sheet.yml`](.github/workflows/sync-sheet.yml) compares the two once a week (and on demand from the Actions tab):
+
+| What it finds | What it does |
+| --- | --- |
+| No difference | Nothing |
+| The sheet was updated | Opens a pull request with the new data. A person decides whether to merge |
+| The sheet cannot be read (deleted or made private) | Leaves the data alone and opens an issue |
+| The sheet was emptied or lost more than 20% of its rows | Leaves the data alone and opens an issue |
+| The sheet's columns changed | Leaves the data alone and opens an issue |
+
+Merging the pull request overwrites any fixes made directly to the CSV files in `data/booklet/`; review the diff and re-apply the ones still needed.
+
+For the workflow to open pull requests, enable Settings → Actions → General → “Allow GitHub Actions to create and approve pull requests”.
+
+To do the same by hand:
 
 ```bash
 sh scripts/snapshot-data.sh
 ```
+
+If a large deletion in the sheet is intended, add `--force` to accept it.

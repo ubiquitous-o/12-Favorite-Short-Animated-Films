@@ -18,4 +18,4 @@ made by **Zach Lieberman**.
 As Zach notes, not everything has been verified: titles come from OCR and many YouTube links from automated search.
 The meaning of the link tags (`(F)`, `(auto)`, …) is explained in the sheet's “About this file” tab.
 
-`scripts/snapshot-data.sh` pulls in the latest version of the sheet.
+A weekly workflow (`.github/workflows/sync-sheet.yml`) compares this copy with the sheet and opens a pull request when the sheet has changed. `scripts/snapshot-data.sh` does the same by hand.

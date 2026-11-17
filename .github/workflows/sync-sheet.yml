@@ -1,0 +1,89 @@
+name: sync-sheet
+
+# 週に1回、Zach Lieberman のスプレッドシートと data/booklet/ を比べる。
+# - 内容が変わっていれば、取り込むプルリクエストを作る（マージするかは人が決める）
+# - シートが読めない・空になった・別物になった場合は、データに触らず Issue で知らせる
+# サイトはリポジトリ内のコピーを読むので、どの場合も公開中のサイトには影響しない。
+
+on:
+  schedule:
+    - cron: "23 2 * * 1" # 毎週月曜 02:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: sync-sheet
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: sheet-update
+      ISSUE_TITLE: The spreadsheet check found a problem
+      BASE_BRANCH: ${{ github.event.repository.default_branch }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: シートを取得して比べる
+        id: sync
+        run: sh scripts/snapshot-data.sh || true # 結果は outputs.result で受け取る
+
+      - name: 変更があればプルリクエストを作る
+        if: steps.sync.outputs.result == 'changed'
+        env:
+          MESSAGE: ${{ steps.sync.outputs.message }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add data/booklet
+          git commit -m "Update data/booklet from Zach Lieberman's spreadsheet"
+          git push --force origin "$BRANCH"
+          if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+            {
+              echo "The spreadsheet has changed since the copy in \`data/booklet/\` was taken."
+              echo
+              echo "- $MESSAGE"
+              echo
+              echo "Please review the diff before merging. Merging **overwrites any fixes made directly to the CSV files** in this repository; re-apply the ones that are still needed."
+              echo
+              echo "Created automatically by the \`sync-sheet\` workflow."
+            } > "$RUNNER_TEMP/body.md"
+            gh pr create --base "$BASE_BRANCH" --head "$BRANCH" \
+              --title "Update data from the spreadsheet" --body-file "$RUNNER_TEMP/body.md"
+          fi
+
+      - name: 問題があれば Issue で知らせる
+        if: steps.sync.outputs.result == 'problem'
+        env:
+          MESSAGE: ${{ steps.sync.outputs.message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo "The weekly check could not safely read the spreadsheet:"
+            echo
+            echo "- $MESSAGE"
+            echo
+            echo "Nothing was changed. The site keeps using the copy in \`data/booklet/\`, so it is not affected."
+            echo
+            echo "Run: $RUN_URL"
+          } > "$RUNNER_TEMP/body.md"
+          number=$(gh issue list --state open --search "in:title \"$ISSUE_TITLE\"" --json number,title \
+            --jq "map(select(.title == \"$ISSUE_TITLE\")) | .[0].number // empty")
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh issue create --title "$ISSUE_TITLE" --body-file "$RUNNER_TEMP/body.md"
+          fi
+
+      - name: 結果が取れなかった場合は失敗にする
+        if: steps.sync.outputs.result == ''
+        run: |
+          echo "snapshot-data.sh did not report a result" >&2
+          exit 1

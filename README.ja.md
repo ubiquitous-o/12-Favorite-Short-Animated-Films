@@ -129,10 +129,28 @@ sh scripts/build-index.sh
 
 初回だけ、リポジトリの Settings → Pages → Source を「GitHub Actions」にする。
 
-### シートの更新を取り込む
+### シートの更新に追従する
 
-Zach のシートが更新されたら、次を実行して差分を確かめてからコミットする。`data/booklet/` の CSV を直接直していた場合、その修正は上書きされるので注意。
+サイトが読むのは `data/booklet/` のコピーで、シートそのものではない。だからシートに何が起きても、サイトは壊れない。
+
+[`.github/workflows/sync-sheet.yml`](.github/workflows/sync-sheet.yml) が週に1回（Actions タブから手動でも）、両者を比べる。
+
+| 見つけたもの | 動き |
+| --- | --- |
+| 違いなし | 何もしない |
+| シートが更新された | 新しいデータのプルリクエストを作る。マージするかは人が決める |
+| シートが読めない（削除、非公開） | データに触らず、Issue を立てる |
+| シートが空になった、行が2割以上減った | データに触らず、Issue を立てる |
+| シートの列が変わった | データに触らず、Issue を立てる |
+
+プルリクエストをマージすると、`data/booklet/` の CSV を直接直していた修正は上書きされる。差分を見て、必要なものは戻すこと。
+
+ワークフローがプルリクエストを作れるように、Settings → Actions → General → 「Allow GitHub Actions to create and approve pull requests」を有効にする。
+
+同じことを手で行うには:
 
 ```bash
 sh scripts/snapshot-data.sh
 ```
+
+シート側の大きな削除が意図したものなら、`--force` を付けて受け入れる。
