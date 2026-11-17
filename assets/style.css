@@ -48,10 +48,6 @@ html[lang="ja"] [data-lang="en"], html[lang="en"] [data-lang="ja"] { display: no
 .brand strong { font-family: var(--serif); font-size: 16px; letter-spacing: .04em; white-space: nowrap; }
 .brand .counter { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .controls { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
-/* 文言が切り替わるボタンは、両方の文言を重ねて置き、長いほうの幅に固定する */
-#mute { display: inline-grid; }
-#mute span { grid-area: 1 / 1; }
-#mute span[aria-hidden] { visibility: hidden; }
 .ctl { color: var(--muted); display: inline-flex; gap: 5px; align-items: center; white-space: nowrap; }
 .counter { color: var(--muted); font-variant-numeric: tabular-nums; }
 
@@ -153,10 +149,30 @@ dialog form { margin-top: 16px; text-align: right; }
 
 @media (max-width: 900px) {
   body { display: block; overflow: auto; height: auto; }
-  .layout, .left { display: block; }
-  .stage { max-height: none; }
+  .layout { display: block; }
+  /* 左の枠を無くして、動画が一覧の上まで貼り付いたままになるようにする */
+  .left { display: contents; }
+
+  /* ヘッダー: タイトルと件数を縦に積み、操作部品は指で押せる大きさに */
+  .bar { padding: 10px 12px; gap: 8px; }
+  .brand { flex: 1 1 100%; flex-direction: column; gap: 2px; }
+  .brand .counter { white-space: normal; }
+  .controls { width: 100%; gap: 8px 10px; }
+  .bar button, .bar select, .tabs button, .scope button { min-height: 36px; padding: 6px 10px; }
+  .who { margin-bottom: 8px; }
+  /* 16px 未満だと iOS が入力時に画面を拡大してしまう */
+  select, .tabs input { font-size: 16px; }
+
+  /* 動画は画面上部に貼り付け、下の情報や一覧を見ている間も見え続けるようにする */
+  .stage { position: sticky; top: 0; z-index: 5; max-height: 70dvh; }
+  .info { overflow: visible; padding: 12px 14px 16px; }
   .info h1 { font-size: 21px; }
-  .info { overflow: visible; }
-  .side { border-left: 0; border-top: 1px solid var(--line); height: 80vh; }
-  .brand .sub { display: none; }
+  .info .cols { grid-template-columns: 1fr; }
+
+  /* 一覧は、貼り付いた動画の下の残りにちょうど収まる高さ */
+  .side { border-left: 0; border-top: 1px solid var(--line); height: calc(100dvh - min(56.25vw, 70dvh)); min-height: 300px; }
+  .row { padding: 9px 12px; }
+  .timeline { padding: 6px 12px calc(6px + env(safe-area-inset-bottom)); }
+  .tl-axis span:not(.major) { visibility: hidden; }
+  dialog { max-width: calc(100vw - 24px); padding: 16px; }
 }

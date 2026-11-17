@@ -22,7 +22,7 @@
     ja: {
       order: '順番', optYear: '年代順（1906→）', optPicks: '推薦が多い順', optCurator: '紹介者ごと', optShuffle: 'シャッフル',
       clips: '予告編・抜粋も流す', doubt: '不確かなマッチも流す', prev: '前の作品', next: '次の作品',
-      mute: '音を消す', unmute: '音を出す', muteTitle: '音の入/切 (M)', about: '出典・クレジット', close: '閉じる',
+      about: '出典・クレジット', close: '閉じる',
       tabFilms: '作品', tabPeople: '紹介者', search: '作品・監督・紹介者で絞り込み', timeline: '年表', loading: 'データを読み込み中…',
       kind_full: '本編・映画祭サイト掲載', kind_manual: 'リスト作成者が指定した動画', kind_auto: '検索でマッチした動画（未確認）',
       kind_clip: '予告編・抜粋（映画祭サイト掲載）', kind_doubt: '自動マッチ・不確か',
@@ -49,7 +49,7 @@
     en: {
       order: 'Order', optYear: 'By year (1906→)', optPicks: 'Most picked', optCurator: 'Person by person', optShuffle: 'Shuffle',
       clips: 'Include trailers & clips', doubt: 'Include doubtful matches', prev: 'Previous film', next: 'Next film',
-      mute: 'Mute', unmute: 'Unmute', muteTitle: 'Sound on/off (M)', about: 'Sources & credits', close: 'Close',
+      about: 'Sources & credits', close: 'Close',
       tabFilms: 'Films', tabPeople: 'People', search: 'Filter by film, director or person', timeline: 'Timeline', loading: 'Loading data…',
       kind_full: 'Full film · embedded on the festival site', kind_manual: 'Video chosen by the list’s author', kind_auto: 'Matched by search (unverified)',
       kind_clip: 'Trailer or clip (from the festival site)', kind_doubt: 'Auto-matched · doubtful',
@@ -424,18 +424,11 @@
     });
   };
 
-  function renderMute() {
-    // 表示しない側の文言も見えない形で入れておき、切り替えてもボタンの幅が変わらないようにする
-    const [on, off] = state.muted ? ['unmute', 'mute'] : ['mute', 'unmute'];
-    fill($('#mute'), h('span', {}, t(on)), h('span', { 'aria-hidden': 'true' }, t(off)));
-    $('#mute').classList.toggle('accent', state.muted);
-  }
+  // 音の入/切の専用ボタンは置かない。YouTube のプレーヤー自身の音量操作と M キーに任せる
   function setMuted(m) {
     state.muted = m;
-    if (playerReady) {
-      if (m) player.mute(); else { player.unMute(); player.setVolume(100); player.playVideo(); }
-    }
-    renderMute();
+    if (!playerReady) return;
+    if (m) player.mute(); else { player.unMute(); player.setVolume(100); player.playVideo(); }
   }
 
   function loadVideo(vid) {
@@ -670,7 +663,8 @@
         title: t('tlTitle', f), 'aria-label': `${f.year} ${f.title}`,
         onclick: () => { if (state.scope && !state.scope.picks.some((p) => p.film === f)) setScope(null, false); show(f); },
       }))));
-      ticks.push(h('span', {}, y % 10 === 0 || y === lo ? String(y) : ''));
+      // 狭い画面では 20年ごと（major）だけを残す
+      ticks.push(h('span', { class: y % 20 === 0 ? 'major' : '' }, y % 10 === 0 ? String(y) : ''));
     }
     tl.replaceChildren(...cols);
     axis.replaceChildren(...ticks);
@@ -725,7 +719,6 @@
     for (const el of document.querySelectorAll('[data-t-title]')) el.title = t(el.dataset.tTitle);
     for (const el of document.querySelectorAll('[data-t-ph]')) el.placeholder = t(el.dataset.tPh);
     for (const el of document.querySelectorAll('[data-t-aria]')) el.setAttribute('aria-label', t(el.dataset.tAria));
-    renderMute();
   }
 
   function setLang(l) {
@@ -749,10 +742,6 @@
     $('#lang').addEventListener('change', (e) => setLang(e.target.value));
     $('#next').addEventListener('click', next);
     $('#prev').addEventListener('click', prev);
-    $('#mute').addEventListener('click', (e) => {
-      e.stopPropagation(); // 「最初の操作で音を戻す」処理と二重に切り替わらないように
-      setMuted(!state.muted);
-    });
     $('#tabFilms').addEventListener('click', () => { state.tab = 'films'; setTabs(); renderList(); });
     $('#tabPeople').addEventListener('click', () => { state.tab = 'people'; setTabs(); renderList(); });
     $('#search').addEventListener('input', applySearch);
@@ -781,7 +770,7 @@
         ArrowLeft: () => seek(-5), ArrowRight: () => seek(5),
         j: () => seek(-10), l: () => seek(10),
         ArrowUp: () => vol(5), ArrowDown: () => vol(-5),
-        m: () => setMuted(!state.muted),
+        m: () => setMuted(!player.isMuted()),
       };
       const run = keys[e.key.length === 1 ? e.key.toLowerCase() : e.key];
       if (!run) return;
