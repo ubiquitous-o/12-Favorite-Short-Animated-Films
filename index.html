@@ -15,18 +15,7 @@
     <span id="counter" class="counter" aria-live="polite"></span>
   </div>
   <div class="controls">
-    <label class="ctl"><span data-t="order"></span>
-      <select id="order">
-        <option value="year" data-t="optYear"></option>
-        <option value="picks" data-t="optPicks"></option>
-        <option value="curator" data-t="optCurator"></option>
-        <option value="shuffle" data-t="optShuffle"></option>
-      </select>
-    </label>
-    <label class="ctl"><input type="checkbox" id="clips" checked> <span data-t="clips"></span></label>
-    <label class="ctl"><input type="checkbox" id="doubt"> <span data-t="doubt"></span></label>
-    <button id="prev" type="button" data-t-title="prev">⏮</button>
-    <button id="next" type="button" data-t-title="next">⏭</button>    <button id="aboutBtn" type="button" data-t="about"></button>
+    <button id="aboutBtn" type="button" data-t="about"></button>
     <!-- どちらの言語で表示していても読めるよう、言語コードを併記する -->
     <select id="lang" aria-label="Language / 言語">
       <option value="ja">日本語 (JA)</option>
@@ -48,6 +37,20 @@
       <button type="button" role="tab" id="tabFilms" aria-selected="true" data-t="tabFilms"></button>
       <button type="button" role="tab" id="tabPeople" aria-selected="false" data-t="tabPeople"></button>
       <input id="search" type="search" data-t-ph="search" data-t-aria="search">
+    </div>
+    <div class="listbar">
+      <button id="prev" type="button" data-t-title="prev" data-t-aria="prev">⏮</button>
+      <button id="next" type="button" data-t-title="next" data-t-aria="next">⏭</button>
+      <label class="ctl grow"><span data-t="order"></span>
+        <select id="order">
+          <option value="year" data-t="optYear"></option>
+          <option value="picks" data-t="optPicks"></option>
+          <option value="curator" data-t="optCurator"></option>
+          <option value="shuffle" data-t="optShuffle"></option>
+        </select>
+      </label>
+      <label class="ctl"><input type="checkbox" id="clips" checked> <span data-t="clips"></span></label>
+      <label class="ctl"><input type="checkbox" id="doubt"> <span data-t="doubt"></span></label>
     </div>
     <div id="scope" class="scope" hidden></div>
     <div id="list" class="list"></div>
