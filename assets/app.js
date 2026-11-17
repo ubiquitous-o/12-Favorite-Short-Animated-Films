@@ -23,6 +23,8 @@
       order: '順番', optYear: '年代順（1906→）', optPicks: '推薦が多い順', optCurator: '紹介者ごと', optShuffle: 'シャッフル',
       clips: '予告編・抜粋も流す', doubt: '不確かなマッチも流す', prev: '前の作品', next: '次の作品',
       about: '出典・クレジット', close: '閉じる',
+      gateTitle: '上映を始める', gateSound: '🔊 音ありで始める', gateMuted: '🔇 音なしで始める',
+      gateCountdown: (n) => `選ばない場合、${n}秒後に音なしで始まる`,
       tabFilms: '作品', tabPeople: '紹介者', search: '作品・監督・紹介者で絞り込み', timeline: '年表', loading: 'データを読み込み中…',
       kind_full: '本編・映画祭サイト掲載', kind_manual: 'リスト作成者が指定した動画', kind_auto: '検索でマッチした動画（未確認）',
       kind_clip: '予告編・抜粋（映画祭サイト掲載）', kind_doubt: '自動マッチ・不確か',
@@ -50,6 +52,8 @@
       order: 'Order', optYear: 'By year (1906→)', optPicks: 'Most picked', optCurator: 'Person by person', optShuffle: 'Shuffle',
       clips: 'Include trailers & clips', doubt: 'Include doubtful matches', prev: 'Previous film', next: 'Next film',
       about: 'Sources & credits', close: 'Close',
+      gateTitle: 'Start the screening', gateSound: '🔊 Start with sound', gateMuted: '🔇 Start muted',
+      gateCountdown: (n) => `If you don’t choose, it starts muted in ${n} seconds`,
       tabFilms: 'Films', tabPeople: 'People', search: 'Filter by film, director or person', timeline: 'Timeline', loading: 'Loading data…',
       kind_full: 'Full film · embedded on the festival site', kind_manual: 'Video chosen by the list’s author', kind_auto: 'Matched by search (unverified)',
       kind_clip: 'Trailer or clip (from the festival site)', kind_doubt: 'Auto-matched · doubtful',
@@ -334,7 +338,8 @@
     tab: 'films',
     current: null,
     order: [],         // いまの範囲の作品（表示順 = 上映順）
-    muted: false,      // 初期値は音あり。ブラウザに止められたときだけ無音で始める
+    started: false,    // 上映前の選択（音あり/音なし）が済んだか
+    muted: false,
     everPlayed: false,
   };
   const broken = new Set();
@@ -387,29 +392,13 @@
       events: {
         onReady: () => {
           playerReady = true;
+          // 上映前の選択がプレーヤーの準備より先に済んでいた場合、ここで音の設定を反映する
+          if (state.started) applySound();
           if (pendingVid) loadVideo(pendingVid);
-          // 音ありの自動再生はブラウザが止めることがある。その場合だけ無音で流し始める。
-          // 読み込み中（状態 3）は「止められた」のではないので待つ
-          const check = () => {
-            if (state.everPlayed) return;
-            if (player.getPlayerState() === 3) { setTimeout(check, 2000); return; }
-            playMutedUntilGesture();
-          };
-          setTimeout(check, 4000);
         },
         onStateChange: (e) => {
-          if (e.data === 1) {
-            state.everPlayed = true; clearTimer(); hideOverlay();
-            // YouTube は前回の消音を覚えている。最初の再生で一度だけ音を戻してみる。
-            // ブラウザが許さない場合は再生が止まるので、そのときは無音に戻して操作を待つ
-            if (!soundProbed) {
-              soundProbed = true;
-              if (!state.muted && player.isMuted()) {
-                player.unMute();
-                setTimeout(() => { if (!state.muted && player.getPlayerState() === 2) playMutedUntilGesture(); }, 700);
-              }
-            }
-          } else if (e.data === 0) next();
+          if (e.data === 1) { state.everPlayed = true; clearTimer(); hideOverlay(); }
+          else if (e.data === 0) next();
         },
         onError: () => {
           const f = state.current;
@@ -437,25 +426,43 @@
     else { player.unMute(); if (player.getVolume() === 0) player.setVolume(100); player.playVideo(); }
   }
 
-  // ブラウザに音を止められたとき: 無音で流し、最初の操作（動画の上のクリックも含む）で音を戻す
-  let soundProbed = false, awaitingGesture = false;
-  function playMutedUntilGesture() {
-    setMuted(true);
-    player.playVideo();
-    if (awaitingGesture) return;
-    awaitingGesture = true;
-    const restore = () => {
-      document.removeEventListener('pointerdown', restore, true);
-      document.removeEventListener('keydown', restore, true);
-      window.removeEventListener('blur', onBlur);
-      awaitingGesture = false;
-      setMuted(false);
-    };
-    // 動画（iframe）の中のクリックはこのページに届かない。フォーカスが iframe に移ったことで知る
-    const onBlur = () => setTimeout(() => { if (document.activeElement && document.activeElement.tagName === 'IFRAME') restore(); }, 0);
-    document.addEventListener('pointerdown', restore, true);
-    document.addEventListener('keydown', restore, true);
-    window.addEventListener('blur', onBlur);
+  function applySound() {
+    if (state.muted) player.mute();
+    else { player.unMute(); if (player.getVolume() === 0) player.setVolume(100); }
+  }
+
+  // ---- 上映前の選択 ----
+  // 再生を始める前に、音あり・音なしを選んでもらう。ブラウザは操作なしの音あり再生を止めるので、
+  // 音ありはここでのクリックをきっかけに始める。選ばなければ、しばらくして音なしで始まる。
+  const GATE_SECONDS = 15;
+  let gateTick = null, gateLeft = 0, gateCount = null;
+
+  function renderGate() {
+    gateCount = h('p', { class: 'small' }, t('gateCountdown', gateLeft));
+    showOverlay(
+      h('p', { class: 'big' }, t('gateTitle')),
+      h('div', { class: 'gate-actions' },
+        h('button', { class: 'accent', type: 'button', onclick: () => startScreening(false) }, t('gateSound')),
+        h('button', { type: 'button', onclick: () => startScreening(true) }, t('gateMuted'))),
+      gateCount,
+    );
+  }
+  function openGate() {
+    gateLeft = GATE_SECONDS;
+    renderGate();
+    gateTick = setInterval(() => {
+      gateLeft -= 1;
+      if (gateLeft <= 0) startScreening(true);
+      // ボタンは作り直さない。作り直すと、押している最中のクリックが消える
+      else gateCount.textContent = t('gateCountdown', gateLeft);
+    }, 1000);
+  }
+  function startScreening(muted) {
+    clearInterval(gateTick);
+    state.started = true;
+    state.muted = muted;
+    if (playerReady) applySound();
+    show(state.current);
   }
 
   function loadVideo(vid) {
@@ -485,6 +492,7 @@
     markRows(true);
     updateCounter();
     clearTimer();
+    if (!state.started) return; // 上映前の選択が済むまでは、作品を選ぶだけで再生しない
     const v = bestVideo(film);
     if (v && !broken.has(film.id)) {
       if (state.everPlayed) hideOverlay();
@@ -757,6 +765,7 @@
     renderTimeline();
     refresh();
     renderInfo();
+    if (!state.started) renderGate();
   }
 
   // ---------------------------------------------------------------- wiring
@@ -782,7 +791,7 @@
     document.addEventListener('keydown', (e) => {
       // キー操作は YouTube のプレーヤーと同じ。作品の切り替えはキーではしない
       if (/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName) || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (!playerReady || $('#about').open) return;
+      if (!playerReady || !state.started || $('#about').open) return;
       // 連打すると getCurrentTime がまだ前の位置を返すので、直前のシーク先を起点にして積み上げる
       const seek = (d) => {
         const now = Date.now();
@@ -839,6 +848,7 @@
     try { wanted = decodeURIComponent(location.hash.slice(1)); } catch { /* 壊れたハッシュは無視 */ }
     const start = films.get(wanted) || films.get(store.get('last', '')) || null;
     show(start && playable(start) ? start : state.order.find(playable) || state.order[0]);
+    openGate();
   }
 
   init();
