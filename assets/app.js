@@ -17,6 +17,9 @@
     doubt:  { rank: 3, cls: 'warn' },
   };
 
+  // 投稿されたリストが名乗れる種類。"full"（映画祭サイト掲載の本編）はシート由来の動画だけのもの
+  const LIST_KINDS = ['manual', 'auto', 'clip', 'doubt'];
+
   // ---------------------------------------------------------------- 文言（日本語 / English）
   const TEXT = {
     ja: {
@@ -27,7 +30,7 @@
       gateCountdown: (n) => `選ばない場合、${n}秒後に音なしで始まる`,
       tabFilms: '作品', tabPeople: '紹介者', search: '作品・監督・紹介者で絞り込み', timeline: '年表', loading: 'データを読み込み中…',
       kind_full: '本編・映画祭サイト掲載', kind_manual: 'リスト作成者が指定した動画', kind_auto: '検索でマッチした動画（未確認）',
-      kind_clip: '予告編・抜粋（映画祭サイト掲載）', kind_doubt: '自動マッチ・不確か',
+      kind_clip: '予告編・抜粋', kind_doubt: '不確かなマッチ',
       cantPlay: 'この動画はここでは再生できない', cantPlayWhy: '埋め込みが許可されていないか、削除された可能性がある。まもなく次の作品へ。',
       openYT: 'YouTube で開く', blocked: '自動再生がブラウザに止められた', start: '上映を始める', loadingVideo: '動画を読み込み中…',
       cantPlayShort: 'この動画はここでは再生できない。', skippedKind: 'この作品の動画は、いまの設定では流さない種類（予告編または不確かなマッチ）。',
@@ -45,7 +48,7 @@
       tlTitle: (f) => `${f.year} ${f.title} — ${f.director}（${f.picks.length}人）`,
       dataErr: 'データを読み込めなかった', openSheet: 'スプレッドシートを開く',
       sheetErr: (s, c) => `スプレッドシート「${s}」を取得できない (HTTP ${c})`, noFilms: '作品が1件も読めなかった',
-      fromSnapshot: 'このサイトはシートを取り込んだコピーを使っている。', fromLive: 'このサイトは表示のたびにシートを直接読んでいる。',
+      fromSnapshot: 'このサイトは、シートを取り込んだコピーを使っています。', fromLive: 'このサイトは、表示のたびにシートを直接読んでいます。',
       none: 'なし', journal: '映画祭ジャーナル', direct: 'このサイトへの投稿', source: '出典',
     },
     en: {
@@ -56,7 +59,7 @@
       gateCountdown: (n) => `If you don’t choose, it starts muted in ${n} seconds`,
       tabFilms: 'Films', tabPeople: 'People', search: 'Filter by film, director or person', timeline: 'Timeline', loading: 'Loading data…',
       kind_full: 'Full film · embedded on the festival site', kind_manual: 'Video chosen by the list’s author', kind_auto: 'Matched by search (unverified)',
-      kind_clip: 'Trailer or clip (from the festival site)', kind_doubt: 'Auto-matched · doubtful',
+      kind_clip: 'Trailer or clip', kind_doubt: 'Doubtful match',
       cantPlay: 'This video can’t be played here', cantPlayWhy: 'Embedding may be disabled, or the video may have been removed. Moving on shortly.',
       openYT: 'Open on YouTube', blocked: 'The browser blocked autoplay', start: 'Start the screening', loadingVideo: 'Loading video…',
       cantPlayShort: 'This video can’t be played here.', skippedKind: 'The only video for this film is a trailer or a doubtful match, which the current settings skip.',
@@ -317,7 +320,7 @@
             id: `${cur.id}:${i}`, title: p.title, director: p.director || '', jpTitle: p.jpTitle || '', jpDirector: '',
             year: p.year || null, country: p.country || '',
             // youtubeKind: "manual" はリスト作成者本人が示した動画。省略時は検索で見つけた未確認の動画として扱う
-            videos: urls.map((u) => ({ kind: Object.hasOwn(KIND, p.youtubeKind) ? p.youtubeKind : 'auto', vid: youtubeId(u), url: u })).filter((v) => v.vid),
+            videos: urls.map((u) => ({ kind: LIST_KINDS.includes(p.youtubeKind) ? p.youtubeKind : 'auto', vid: youtubeId(u), url: u })).filter((v) => v.vid),
             length: '', official: parseLinks(p.official), other: [], related: [], offline: '', notes: p.notes || '',
             picks: [], seq: films.size,
           };

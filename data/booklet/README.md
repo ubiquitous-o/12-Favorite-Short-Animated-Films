@@ -1,10 +1,10 @@
 # data/booklet
 
-The CSV files in this folder are a copy (taken 2026-11-17) of the spreadsheet
+The CSV files in this folder are a copy of the spreadsheet
 [12 favorite short animated films](https://docs.google.com/spreadsheets/d/1BtHFvXhsUyDKANK-F2c1jDNItOld6_j4lve8Nahudk0/edit)
-made by **Zach Lieberman**.
+made by **Zach Lieberman**. The copy was first taken on 2026-11-17; later updates arrive as pull requests, so see the git history for its current date.
 
-このフォルダの CSV は、**Zach Lieberman** が作成した上記スプレッドシートのコピー（2026-11-17 取得）。
+このフォルダの CSV は、**Zach Lieberman** が作成した上記スプレッドシートのコピー。最初の取得は 2026-11-17。以後の更新はプルリクエストで入るので、現在の日付は git の履歴を参照。
 
 - His post / 公開時のポスト: https://x.com/zachlieberman/status/2122023218701586705
 - The booklet / 元になった冊子: Hiroshima Animation Season 2026, “Your Favorite 12 Animated Short Films From the Past 120 Years (1906–2026)”

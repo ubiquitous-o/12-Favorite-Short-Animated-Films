@@ -10,7 +10,7 @@ CHECK='
   and all(.picks[];
     (.title | type == "string" and length > 0)
     and ((.director // "") | type == "string")
-    and ((.youtubeKind // "auto") | IN("manual", "auto", "clip", "doubt", "full"))
+    and ((.youtubeKind // "auto") | IN("manual", "auto", "clip", "doubt"))
     and ((.youtube // []) | if type == "array" then . else [.] end
          | all(.[]; type == "string" and test("^https://(www\\.)?(youtube\\.com/watch\\?v=|youtu\\.be/)[A-Za-z0-9_-]{11}"))))
   and ((.source.url // "https://") | test("^https?://"))

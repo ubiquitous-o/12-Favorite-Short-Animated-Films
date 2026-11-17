@@ -6,6 +6,13 @@
 
 A static site that plays short animated films chosen by filmmakers, one after another, with credit to the people who picked them and to the sources.
 
+## Using the site
+
+- When the page opens it asks whether to start **with sound** or **muted**. If you don't choose, it starts muted after 15 seconds, and then keeps playing one film after another on its own. (Browsers do not allow sound to start without a click.)
+- The panel beside the video lists every film and every person. Click a film to play it, or a person to play their list. The order, the filters and the previous/next buttons are at the top of that panel; the strip at the bottom is a timeline from 1906 to today.
+- Keyboard controls are the same as YouTube's: `Space` or `K` play/pause, `←` `→` 5 seconds, `J` `L` 10 seconds, `↑` `↓` volume, `M` mute.
+- The address changes with each film (for example `…/#f102`), so you can copy it to share a specific film.
+
 ## Credits
 
 This site is built on the spreadsheet
@@ -19,20 +26,31 @@ He scanned and transcribed the booklet and looked up which films can be watched 
 
 As Zach notes himself, not everything in the sheet has been verified. Titles were transcribed by OCR and many YouTube links come from automated search. The site shows, for every video, which kind it is.
 
+**Found a mistake or a problem?** If a video is the wrong film, some information is incorrect, or you are a filmmaker or rights holder and would like a film or a video removed, please [open an issue](https://github.com/ubiquitous-o/12-Favorite-Short-Animated-Films/issues).
+
 ## Data
 
 Everything lives in this repository.
 
 | Location | Contents |
 | --- | --- |
-| [`data/booklet/`](data/booklet/) | A copy of Zach Lieberman's spreadsheet as CSV: 68 people, 808 picks, 593 films |
+| [`data/booklet/`](data/booklet/) | A copy of Zach Lieberman's spreadsheet as CSV (68 people, 808 picks and 593 films when first imported on 2026-11-17) |
 | [`data/lists/`](data/lists/) | Lists from anyone else, one JSON file per person |
 
 ## Add your own list
 
-1. Copy [`data/lists/_template.json`](data/lists/_template.json) to `data/lists/your-name.json` (lowercase letters, digits and hyphens).
+1. Copy [`data/lists/_template.json`](data/lists/_template.json) to `data/lists/your-name.json`. Use only lowercase letters, digits, `.`, `_` and `-` in the file name, and do not start it with `_`.
 2. Edit it and open a pull request.
 3. Once merged, it appears on the site within a few minutes.
+
+### Check before you open a pull request
+
+[Run the site locally](#run-locally), open the People tab and select your list.
+
+- A pick that was **merged into an existing film** shows the other people who picked it, and a count such as `×3` in the list.
+- A pick that was **added as a new film** shows only you. If you expected it to match a film that is already there, the title is probably spelled differently: add the existing spelling to `aliases`. Otherwise the same film ends up listed twice.
+
+The automatic checks on a pull request only verify the format of the file. They do not detect duplicates or wrong videos.
 
 ### Format
 
@@ -93,7 +111,7 @@ Values for `youtubeKind`:
 | `"manual"` | Video chosen by the list's author | You have watched the video and it is the right film. |
 | `"auto"` *(default)* | Matched by search (unverified) | The link was found by searching and not checked. |
 | `"clip"` | Trailer or clip | It is not the full film. Skipped when “Include trailers & clips” is off. |
-| `"doubt"` | Auto-matched · doubtful | You are not sure it is the right film. Skipped unless “Include doubtful matches” is on. |
+| `"doubt"` | Doubtful match | You are not sure it is the right film. Skipped unless “Include doubtful matches” is on. |
 
 Please prefer official uploads by the filmmaker or distributor.
 
@@ -118,6 +136,8 @@ To run the same validation as pull requests do (requires `jq`):
 ```bash
 sh scripts/build-index.sh
 ```
+
+That script also writes `data/lists/index.json`. While that file exists, the local site only loads the lists named in it, so a JSON file you add afterwards will not appear until you run the script again or delete `data/lists/index.json`. (Without the file, the local site picks up every JSON file in the folder. The file is not committed.)
 
 ## How it is published
 
@@ -155,3 +175,5 @@ sh scripts/snapshot-data.sh
 ```
 
 If a large deletion in the sheet is intended, add `--force` to accept it.
+
+GitHub pauses scheduled workflows after 60 days without activity in the repository. If the weekly check stops, re-enable it from the Actions tab.
