@@ -1,0 +1,32 @@
+{
+  "name": "ꕯჄ⚉Ⴤꕯ",
+  "handle": "@IY0YI",
+  "role": {
+    "ja": "X のポストで公開された個人のリスト",
+    "en": "A personal list shared in a post on X"
+  },
+  "note": {
+    "ja": "「私の好きなアートアニメーション 12 選」。視聴回数順、有名すぎるものは除外とのこと。",
+    "en": "“My 12 favorite art animations” — ordered by how often they've watched them, leaving out the most famous ones."
+  },
+  "source": {
+    "label": { "ja": "X のポスト", "en": "Post on X" },
+    "url": "https://x.com/IY0YI/status/2122002770798784568"
+  },
+  "links": { "X": "https://x.com/IY0YI" },
+  "picks": [
+    { "title": "Jeu", "director": "Georges Schwizgebel", "year": 2006 },
+    { "title": "The Snails", "aliases": ["Les Escargots", "Snails"], "director": "René Laloux / Roland Topor", "year": 1965 },
+    { "title": "Monkey's Teeth", "aliases": ["Les Dents du singe", "The Monkey's Teeth"], "director": "René Laloux", "year": 1960, "youtube": "https://www.youtube.com/watch?v=vH5v1LrmaMY" },
+    { "title": "Tichý týden v domě", "aliases": ["A Quiet Week in the House", "A Quiet Week in a House"], "director": "Jan Švankmajer", "year": 1969, "youtube": "https://www.youtube.com/watch?v=C0dZTC8NnWI" },
+    { "title": "Miramare", "director": "Michaela Müller", "year": 2009, "youtube": "https://www.youtube.com/watch?v=KRpZvgtrBeU" },
+    { "title": "A Chairy Tale", "director": "Norman McLaren", "year": 1957, "youtube": "https://www.youtube.com/watch?v=NSRjRctL8XA",
+      "notes": { "ja": "動画は National Film Board of Canada の YouTube チャンネルのもの", "en": "Video from the National Film Board of Canada's YouTube channel" } },
+    { "title": "Virile Games", "aliases": ["Mužné hry", "Manly Games"], "director": "Jan Švankmajer", "year": 1988 },
+    { "title": "Jumping", "director": "Osamu Tezuka", "year": 1984 },
+    { "title": "Prometheus' Garden", "director": "Bruce Bickford", "year": 1988 },
+    { "title": "Disc Jockey", "aliases": ["Diskžokej", "The Disc Jockey"], "director": "Jiří Barta", "year": 1980, "youtube": "https://www.youtube.com/watch?v=bEWSdj93SP8" },
+    { "title": "Transfiguration", "director": "Daniel Guyonnet" },
+    { "title": "Harpya", "director": "Raoul Servais", "year": 1979, "youtube": "https://www.youtube.com/watch?v=nKv5qBCEvfA" }
+  ]
+}

@@ -1,0 +1,137 @@
+# 12 favorite short animated films
+
+**English** | [日本語](README.ja.md)
+
+A static site that plays short animated films chosen by filmmakers, one after another, with credit to the people who picked them and to the sources. The interface is available in English and Japanese.
+
+## Credits
+
+This site is built on the spreadsheet
+**“[12 favorite short animated films](https://docs.google.com/spreadsheets/d/1BtHFvXhsUyDKANK-F2c1jDNItOld6_j4lve8Nahudk0/edit)”
+made by [Zach Lieberman](https://x.com/zachlieberman)**
+([his post](https://x.com/zachlieberman/status/2122023218701586705)).
+He scanned and transcribed the booklet and looked up which films can be watched online. All film, participant and link data comes from that sheet, and the site borrows its name from it.
+
+- **The people who picked**: the 68 contributors to the Hiroshima Animation Season 2026 booklet “Your Favorite 12 Animated Short Films From the Past 120 Years (1906–2026)”. The primary source for each person's list is the [festival's journal](https://animation.hiroshimafest.org/journal/).
+- **The films**: all rights belong to their makers and rights holders. Films play through YouTube's embedded player; no video files are stored here.
+
+As Zach notes himself, not everything in the sheet has been verified. Titles were transcribed by OCR and many YouTube links come from automated search. The site shows, for every video, which kind it is.
+
+## Data
+
+Everything lives in this repository.
+
+| Location | Contents |
+| --- | --- |
+| [`data/booklet/`](data/booklet/) | A copy of Zach Lieberman's spreadsheet as CSV: 68 people, 808 picks, 593 films |
+| [`data/lists/`](data/lists/) | Lists from anyone else, one JSON file per person |
+
+## Add your own list
+
+1. Copy [`data/lists/_template.json`](data/lists/_template.json) to `data/lists/your-name.json` (lowercase letters, digits and hyphens).
+2. Edit it and open a pull request.
+3. Once merged, it appears on the site within a few minutes.
+
+### Format
+
+Only `name` and `picks` (each with a `title`) are required.
+
+```json
+{
+  "name": "Your name",
+  "handle": "@handle",
+  "source": { "label": "Post on X", "url": "https://x.com/..." },
+  "picks": [
+    { "title": "Tango", "director": "Zbigniew Rybczyński" },
+    { "title": "Hedgehog in the Fog", "director": "Yuri Norstein" }
+  ]
+}
+```
+
+If you add a list that someone else published, always fill in `source` with the original location.
+
+### Field reference
+
+Fields marked **text** can be a plain string, or `{ "en": "...", "ja": "..." }` to provide both languages. With a plain string, the same text is shown in both.
+
+#### The list
+
+| Field | Required | Type | What it is |
+| --- | --- | --- | --- |
+| *(file name)* | yes | — | `your-name.json`. Lowercase letters, digits, `.`, `_` and `-` only. It becomes the list's ID and part of the URLs of films only you picked, so avoid renaming it later. Files starting with `_` are ignored. |
+| `name` | yes | string | Your name as it should be displayed. |
+| `handle` | no | string | A handle shown next to the name, e.g. `@handle`. |
+| `role` | no | text | Who you are: a title, affiliation or short description. Shown under the name. |
+| `note` | no | text | A line about this list (how you chose, what it is). Shown when your list is selected. |
+| `source` | no | object | Where the list was first published. Shown as the “source” link next to your name on every film you picked. If omitted, the list is labelled “Submitted to this site”. |
+| `source.url` | no | URL | Link to the original post or page. Must start with `http://` or `https://`. |
+| `source.label` | no | text | Text of that link, e.g. `Post on X`. Defaults to “Source”. |
+| `links` | no | object | Your own links, as `{ "Label": "URL" }`. Any labels work (`Website`, `X`, `Instagram`, `YouTube`, `Vimeo`…). Shown when your list is selected. |
+| `picks` | yes | array | Your films, in the order you want them listed and played. At least one. |
+
+#### Each pick
+
+| Field | Required | Type | What it is |
+| --- | --- | --- | --- |
+| `title` | yes | string | The film's title. Used for display and for matching against films already on the site. |
+| `aliases` | no | array of strings | Other titles (original-language title, alternative translations). Only used for matching; the first one that matches wins. |
+| `director` | no, but recommended | string | Director(s). Separate several with ` / `. Used for display and to confirm a match. |
+| `year` | no | number | Year of release. Places the film in the timeline and the by-year order. |
+| `country` | no | string | Country of production, in English. |
+| `jpTitle` | no | string | Japanese title, shown under the main title in the Japanese interface. |
+| `youtube` | no | URL, or array of URLs | The video to play: `https://www.youtube.com/watch?v=…` or `https://youtu.be/…`. Without it the film is listed but skipped during playback. |
+| `youtubeKind` | no | string | How the video is labelled; see below. Defaults to `"auto"`. |
+| `official` | no | string | An official or best place to watch, shown as a link. Either a URL, or `Label: URL`; separate several with ` \| `. |
+| `notes` | no | text | Anything worth adding about the film or the video. |
+
+Values for `youtubeKind`:
+
+| Value | Label on the site | Use it when |
+| --- | --- | --- |
+| `"manual"` | Video chosen by the list's author | You have watched the video and it is the right film. |
+| `"auto"` *(default)* | Matched by search (unverified) | The link was found by searching and not checked. |
+| `"clip"` | Trailer or clip | It is not the full film. Skipped when “Include trailers & clips” is off. |
+| `"doubt"` | Auto-matched · doubtful | You are not sure it is the right film. Skipped unless “Include doubtful matches” is on. |
+
+Please prefer official uploads by the filmmaker or distributor.
+
+#### How picks are matched to existing films
+
+- A pick is merged into a film already on the site when its `title` or one of its `aliases` equals that film's title (English or Japanese), **and** the directors share at least one name word of four or more letters. If you leave out `director`, the title alone decides.
+- Comparison ignores case, accents, punctuation, spaces and a leading “The”, “A” or “An”. So `the snails` matches `The Snails`, and `Svankmajer` matches `Švankmajer`.
+- When a pick is merged, you are added to that film's “Picked by” list and **the existing film's details and video are used**. Your `year`, `country`, `jpTitle`, `youtube`, `youtubeKind`, `official` and `notes` for that pick are ignored.
+- When nothing matches, the pick is added as a new film using the fields you provided.
+- To correct the details or the video of an existing film, edit [`data/booklet/all-picks.csv`](data/booklet/all-picks.csv) instead.
+
+## Run locally
+
+YouTube embeds do not work from `file://`, so serve the folder over HTTP.
+
+```bash
+python3 -m http.server 4173
+```
+
+To run the same validation as pull requests do (requires `jq`):
+
+```bash
+sh scripts/build-index.sh
+```
+
+## How it is published
+
+[`.github/workflows/site.yml`](.github/workflows/site.yml) runs on every push to `main`.
+
+1. Validates `data/lists/*.json` and generates the index `data/lists/index.json`.
+2. Publishes to GitHub Pages.
+
+On pull requests only step 1 runs.
+
+The first time, set Settings → Pages → Source to “GitHub Actions”.
+
+### Pulling in updates from the sheet
+
+When Zach's sheet changes, run this, review the diff, and commit. Any fixes made directly to the CSV files in `data/booklet/` will be overwritten.
+
+```bash
+sh scripts/snapshot-data.sh
+```

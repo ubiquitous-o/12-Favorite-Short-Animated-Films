@@ -1,0 +1,4 @@
+# 公開時に GitHub Actions が作るファイル
+data/lists/index.json
+_site/
+.DS_Store

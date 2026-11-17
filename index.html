@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12 favorite short animated films</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎥%3C/text%3E%3C/svg%3E">
+<meta name="description" content="Short animated films chosen by filmmakers, researchers and programmers, played one after another with credit to the people who picked them and to the sources.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <strong>12 favorite short animated films</strong>
+  </div>
+  <div class="controls">
+    <span id="counter" class="counter" aria-live="polite"></span>
+    <label class="ctl"><span data-t="order"></span>
+      <select id="order">
+        <option value="year" data-t="optYear"></option>
+        <option value="picks" data-t="optPicks"></option>
+        <option value="curator" data-t="optCurator"></option>
+        <option value="shuffle" data-t="optShuffle"></option>
+      </select>
+    </label>
+    <label class="ctl"><input type="checkbox" id="clips" checked> <span data-t="clips"></span></label>
+    <label class="ctl"><input type="checkbox" id="doubt"> <span data-t="doubt"></span></label>
+    <button id="prev" type="button" data-t-title="prev">⏮</button>
+    <button id="next" type="button" data-t-title="next">⏭</button>
+    <button id="mute" type="button" data-t-title="muteTitle"></button>
+    <button id="aboutBtn" type="button" data-t="about"></button>
+    <!-- どちらの言語で表示していても読めるよう、ここだけは常に英語と日本語を併記する -->
+    <label class="ctl lang"><span aria-hidden="true">🌐</span> Language
+      <select id="lang" aria-label="Language / 言語">
+        <option value="ja">日本語 (Japanese)</option>
+        <option value="en">English</option>
+      </select>
+    </label>
+  </div>
+</header>
+
+<main class="layout">
+  <section class="left">
+    <div class="stage">
+      <div id="yt"></div>
+      <div id="overlay" class="overlay"><p data-t="loading"></p></div>
+    </div>
+    <article id="info" class="info" aria-live="polite"></article>
+  </section>
+
+  <aside class="side">
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" id="tabFilms" aria-selected="true" data-t="tabFilms"></button>
+      <button type="button" role="tab" id="tabPeople" aria-selected="false" data-t="tabPeople"></button>
+      <input id="search" type="search" data-t-ph="search" data-t-aria="search">
+    </div>
+    <div id="scope" class="scope" hidden></div>
+    <div id="list" class="list"></div>
+  </aside>
+</main>
+
+<footer class="timeline" data-t-aria="timeline">
+  <div id="tl" class="tl"></div>
+  <div id="tlAxis" class="tl-axis"></div>
+</footer>
+
+<dialog id="about">
+  <div data-lang="ja">
+    <h2>出典・クレジット</h2>
+    <p>このサイトは、他の人たちが選び、まとめてくれた情報の上に成り立っている。作品の権利はすべて各作者・権利者のもの。</p>
+    <dl>
+      <dt>選んだ人たち</dt>
+      <dd>ひろしまアニメーションシーズン2026 冊子「Your Favorite 12 Animated Short Films From the Past 120 Years (1906–2026)」に寄稿した68名。各人のリストと言葉は
+        <a href="https://animation.hiroshimafest.org/journal/" target="_blank" rel="noopener noreferrer">映画祭公式ジャーナル ↗</a> が一次ソース。作品ごとに推薦者のジャーナルページへリンクしている。</dd>
+      <dt>データ</dt>
+      <dd><a href="https://x.com/zachlieberman" target="_blank" rel="noopener noreferrer">Zach Lieberman ↗</a> が冊子をスキャンして書き起こし、どの作品がオンラインで観られるかを調べてまとめた
+        <a class="sheetLink" href="#" target="_blank" rel="noopener noreferrer">スプレッドシート「12 favorite short animated films」 ↗</a>
+        （<a href="https://x.com/zachlieberman/status/2122023218701586705" target="_blank" rel="noopener noreferrer">公開時のポスト ↗</a>）が、このサイトの土台。作品・推薦者・リンクのデータはすべてこのシートによる。本人が書いているとおり、すべてが検証済みではない。<span class="dataFrom"></span></dd>
+      <dt>追加のリスト</dt>
+      <dd class="extraCredits"></dd>
+      <dt>動画</dt>
+      <dd>YouTube の埋め込みプレーヤーで再生している。動画ファイルは保存・再配布していない。リンクの多くは自動検索によるもので、公式アップロードとは限らない。各作品に「映画祭サイト掲載」「検索でマッチ」などの区別を表示している。公式の視聴先やソフトの情報がある作品はそちらも併記しているので、気に入った作品はぜひ公式の経路で。</dd>
+      <dt>誤りについて</dt>
+      <dd>書き起こしや自動マッチには誤りが含まれうる。正確な情報は各出典を確認してほしい。</dd>
+    </dl>
+  </div>
+  <div data-lang="en">
+    <h2>Sources &amp; credits</h2>
+    <p>This site stands on what other people chose and compiled. All rights to the films belong to their makers and rights holders.</p>
+    <dl>
+      <dt>The people who picked</dt>
+      <dd>The 68 contributors to the Hiroshima Animation Season 2026 booklet “Your Favorite 12 Animated Short Films From the Past 120 Years (1906–2026)”. The primary source for each person's list is the
+        <a href="https://animation.hiroshimafest.org/journal/" target="_blank" rel="noopener noreferrer">festival's official journal ↗</a>. Every film links to the journal page of each person who picked it.</dd>
+      <dt>Data</dt>
+      <dd>This site is built on the spreadsheet
+        <a class="sheetLink" href="#" target="_blank" rel="noopener noreferrer">“12 favorite short animated films” ↗</a>
+        made by <a href="https://x.com/zachlieberman" target="_blank" rel="noopener noreferrer">Zach Lieberman ↗</a>, who scanned and transcribed the booklet and looked up which films can be watched online
+        (<a href="https://x.com/zachlieberman/status/2122023218701586705" target="_blank" rel="noopener noreferrer">his post ↗</a>). All film, participant and link data comes from that sheet. As he notes himself, not everything has been verified. <span class="dataFrom"></span></dd>
+      <dt>Additional lists</dt>
+      <dd class="extraCredits"></dd>
+      <dt>Videos</dt>
+      <dd>Films play through YouTube's embedded player. No video files are stored or redistributed. Many links come from automated search and are not necessarily official uploads; each film shows whether its video is from the festival site, matched by search, and so on. Where an official source or a physical release is known it is listed too — if you love a film, please seek it out there.</dd>
+      <dt>Errors</dt>
+      <dd>The transcription and the automated matches may contain mistakes. Please check the original sources for accurate information.</dd>
+    </dl>
+  </div>
+  <form method="dialog"><button data-t="close"></button></form>
+</dialog>
+
+<noscript><p style="padding:2rem">This site needs JavaScript. / このサイトは JavaScript が必要。</p></noscript>
+<script src="assets/app.js"></script>
+</body>
+</html>

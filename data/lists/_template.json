@@ -1,0 +1,32 @@
+{
+  "name": "Your name",
+  "handle": "@handle",
+  "role": { "en": "Who you are (optional)", "ja": "肩書きや自己紹介（任意）" },
+  "note": "A line about this list (optional). Any text field can be a plain string like this one, or { \"en\": ..., \"ja\": ... }.",
+  "source": {
+    "label": { "en": "Post on X", "ja": "X のポスト" },
+    "url": "https://example.com/where-this-list-was-first-published"
+  },
+  "links": {
+    "Website": "https://example.com/",
+    "X": "https://x.com/handle"
+  },
+  "picks": [
+    {
+      "title": "Tango",
+      "director": "Zbigniew Rybczyński"
+    },
+    {
+      "title": "Title of a film that is not on the site yet",
+      "aliases": ["Original or alternative title"],
+      "director": "Director's name",
+      "year": 2020,
+      "country": "Japan",
+      "jpTitle": "日本語題（任意）",
+      "youtube": "https://www.youtube.com/watch?v=xxxxxxxxxxx",
+      "youtubeKind": "manual",
+      "official": "https://example.com/official-place-to-watch",
+      "notes": "Anything worth adding (optional)"
+    }
+  ]
+}
