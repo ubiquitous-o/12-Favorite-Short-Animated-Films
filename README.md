@@ -2,7 +2,7 @@
 
 **English** | [日本語](README.ja.md)
 
-A static site that plays short animated films chosen by filmmakers, one after another, with credit to the people who picked them and to the sources. The interface is available in English and Japanese.
+A static site that plays short animated films chosen by filmmakers, one after another, with credit to the people who picked them and to the sources.
 
 ## Credits
 
