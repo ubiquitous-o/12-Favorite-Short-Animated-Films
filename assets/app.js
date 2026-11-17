@@ -313,7 +313,7 @@
             id: `${cur.id}:${i}`, title: p.title, director: p.director || '', jpTitle: p.jpTitle || '', jpDirector: '',
             year: p.year || null, country: p.country || '',
             // youtubeKind: "manual" はリスト作成者本人が示した動画。省略時は検索で見つけた未確認の動画として扱う
-            videos: urls.map((u) => ({ kind: KIND[p.youtubeKind] ? p.youtubeKind : 'auto', vid: youtubeId(u), url: u })).filter((v) => v.vid),
+            videos: urls.map((u) => ({ kind: Object.hasOwn(KIND, p.youtubeKind) ? p.youtubeKind : 'auto', vid: youtubeId(u), url: u })).filter((v) => v.vid),
             length: '', official: parseLinks(p.official), other: [], related: [], offline: '', notes: p.notes || '',
             picks: [], seq: films.size,
           };
