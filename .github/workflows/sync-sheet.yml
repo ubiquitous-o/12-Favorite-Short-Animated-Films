@@ -28,7 +28,7 @@ jobs:
       ISSUE_TITLE: The spreadsheet check found a problem
       BASE_BRANCH: ${{ github.event.repository.default_branch }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: シートを取得して比べる
         id: sync
